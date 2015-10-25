@@ -25,6 +25,7 @@ NSInteger const RMStoreErrorCodeDownloadCanceled = 300;
 NSInteger const RMStoreErrorCodeUnknownProductIdentifier = 100;
 NSInteger const RMStoreErrorCodeUnableToCompleteVerification = 200;
 
+NSString* const RMSKDownloadStarted = @"RMSKDownloadStarted";
 NSString* const RMSKDownloadCanceled = @"RMSKDownloadCanceled";
 NSString* const RMSKDownloadFailed = @"RMSKDownloadFailed";
 NSString* const RMSKDownloadFinished = @"RMSKDownloadFinished";
@@ -318,6 +319,7 @@ typedef void (^RMStoreSuccessBlock)();
 
 - (void)addStoreObserver:(id<RMStoreObserver>)observer
 {
+    [self addStoreObserver:observer selector:@selector(storeDownloadStarted:) notificationName:RMSKDownloadStarted];
     [self addStoreObserver:observer selector:@selector(storeDownloadCanceled:) notificationName:RMSKDownloadCanceled];
     [self addStoreObserver:observer selector:@selector(storeDownloadFailed:) notificationName:RMSKDownloadFailed];
     [self addStoreObserver:observer selector:@selector(storeDownloadFinished:) notificationName:RMSKDownloadFinished];
@@ -336,6 +338,7 @@ typedef void (^RMStoreSuccessBlock)();
 
 - (void)removeStoreObserver:(id<RMStoreObserver>)observer
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:observer name:RMSKDownloadStarted object:self];
     [[NSNotificationCenter defaultCenter] removeObserver:observer name:RMSKDownloadCanceled object:self];
     [[NSNotificationCenter defaultCenter] removeObserver:observer name:RMSKDownloadFailed object:self];
     [[NSNotificationCenter defaultCenter] removeObserver:observer name:RMSKDownloadFinished object:self];
@@ -620,6 +623,9 @@ typedef void (^RMStoreSuccessBlock)();
     if (downloads.count > 0)
     {
         RMStoreLog(@"starting downloads for product %@ started", transaction.payment.productIdentifier);
+
+        [self postNotificationWithName:RMSKDownloadStarted transaction:transaction userInfoExtras:nil];
+
         [queue startDownloads:downloads];
     }
     else

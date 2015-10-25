@@ -226,6 +226,11 @@ extern NSInteger const RMStoreErrorCodeUnableToCompleteVerification;
 @optional
 
 /**
+ Tells the observer that a download has started
+ */
+- (void)storeDownloadStarted:(NSNotification*)notification __attribute__((availability(ios,introduced=6.0)));
+
+/**
  Tells the observer that a download has been canceled.
  @discussion Only for Apple-hosted downloads.
  */
